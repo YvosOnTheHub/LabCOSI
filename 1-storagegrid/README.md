@@ -95,11 +95,13 @@ metadata:
 spec:
   driverName: cosi.trident.netapp.io
   authenticationType: Key
+  multiBucketAccess: MultipleBuckets
 EOF
 ```
 A few notes about the `BucketClass`:  
 - `deletionPolicy`: required parameter. However, a bucket can only be deleted if empty!  
 - `parameters`: can be used to filter out the tenants you can use
+- `multiBucketAccess`: specifies that a set of keys can be used for multiple BucketClaims  
 
 ## C. Bucket Creation
 
@@ -300,7 +302,32 @@ $  kubectl exec po/sg-bucket-client -n cosisg -- sh -c 'aws s3 ls --no-verify-ss
 
 Tadaaa! Point validated!
 
-## F. Delete the bucket
+## F. Sharing keys
+
+In the configuration that is used here, there is only one bucket that is linked to one set of keys. As the parameter `multiBucketAccess`is set to _MultipleBuckets_, the same keys could be used by another bucket in the same namespace.  
+
+However, a `BucketAccess` is immutable, so you need to know in advance how many buckets will shares the same keys. Deleting a BucketAccess and recreating one with references to 2 BucketClaims would generate new keys.  
+
+Here is what the `BucketAccess` would like when created for 2 buckets:
+```yaml
+apiVersion: objectstorage.k8s.io/v1alpha2
+kind: BucketAccess
+metadata:
+  name: sg-bucket-access-example
+  namespace: cosisg
+spec:
+  bucketAccessClassName: trident-s3-key
+  protocol: S3
+  bucketClaims:
+    - bucketClaimName: sg-bucket-claim-rw
+      accessMode: ReadWrite
+      accessSecretName: sg-bucket-creds
+    - bucketClaimName: sg-bucket-claim-ro
+      accessMode: ReadOnly
+      accessSecretName: sg-bucket-creds
+```
+
+## G. Delete the bucket
 
 A bucket can only be deleted when it is empty.  
 Let's first remove all the files:  
