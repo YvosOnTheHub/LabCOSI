@@ -196,7 +196,7 @@ demo
 trident-bc-2602495a-ac32-4a46-a733-6a7052c61dd7
 ```
 
-## C. Bucket Consumption with aws-cli
+## D. Bucket Consumption with aws-cli
 
 We have a bucket, we have keys! Let's first try to interact with this bucket using the aws-cli tool to validate connectivity.  
 We first need to configure the variables in the tool's configuration files:  
@@ -238,7 +238,7 @@ aws() { command aws "$@" 2> >(grep -v InsecureRequestWarning >&2); }
 
 Now that we have validated we can read & write from the bucket, let's try with a pod!
 
-## D. Bucket Consumption in Kubernetes
+## E. Bucket Consumption in Kubernetes
 
 This time, you will create a pod that mounts the secret containing all the bucket information:  
 ```bash
@@ -298,7 +298,9 @@ $  kubectl exec po/sg-bucket-client -n cosisg -- sh -c 'aws s3 ls --no-verify-ss
 2026-11-01 13:24:09          0 test2.txt
 ```
 
-## E. Delete the bucket
+Tadaaa! Point validated!
+
+## F. Delete the bucket
 
 A bucket can only be deleted when it is empty.  
 Let's first remove all the files:  
