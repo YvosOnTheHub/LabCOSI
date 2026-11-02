@@ -2,7 +2,7 @@ echo "############################################"
 echo "# Install Tools"
 echo "############################################"
 apt update
-apt install -y snapd jq ansible-core docker
+apt install -y snapd jq ansible-core docker.io
 snap install kubectl --classic
 snap install helm --classic
 snap install aws-cli --classic

@@ -11,7 +11,7 @@ You can also use the *all_in_one.sh* script in this folder to perform all those 
 We first need to install all the tools required for the demos (docker, kubectl, aws-cli, ...)
 ```bash
 apt update
-apt install -y snapd jq ansible-core docker
+apt install -y snapd jq ansible-core docker.io
 snap install kubectl --classic
 snap install helm --classic
 snap install aws-cli --classic
