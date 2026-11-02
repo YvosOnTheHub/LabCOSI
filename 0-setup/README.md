@@ -1,5 +1,5 @@
 #########################################################################################
-# Lab setup
+# Lab setup (**to run on the host Ubuntu**)
 #########################################################################################
 
 The purpose of the lab being to test COSI, no need for a fancy Kubernetes cluster, let's create a KinD cluster (Kubernetes in Docker).  
