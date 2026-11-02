@@ -107,12 +107,12 @@ echo
 cp ~/.bashrc ~/.bashrc.bak
 cat <<EOT >> ~/.bashrc
 alias k=kubectl
-alias kc=kubectl create
-alias kg=kubectl get
-alias kd=kubectl describe
-alias kdel=kubectl delete
-alias kedit=kubectl edit
-alias kx=kubectl exec -it
+alias kc='kubectl create'
+alias kg='kubectl get'
+alias kd='kubectl describe'
+alias kdel='kubectl delete'
+alias kedit='kubectl edit'
+alias kx='kubectl exec -it'
 alias trident=tridentctl -n trident
 EOT
 echo "Bash customized!"
