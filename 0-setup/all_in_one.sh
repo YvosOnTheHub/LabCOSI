@@ -2,11 +2,22 @@ echo "############################################"
 echo "# Install Tools"
 echo "############################################"
 apt update
-apt install -y snapd jq ansible-core docker.io
+echo "### INSTALL SNAPD"
+apt install -y snapd
+echo "### INSTALL ANSIBLE-CORE"
+apt install -y ansible-core
+echo "### INSTALL DOCKER"
+apt install -y docker.io
+echo "### INSTALL JQ"
+apt install -y jq
+echo "### INSTALL KUBECTL"
 snap install kubectl --classic
-snap install helm --classic
-snap install aws-cli --classic
 systemctl enable --now docker
+echo "### INSTALL HELM"
+snap install helm --classic
+echo "### INSTALL AWS-CLI"
+snap install aws-cli --classic
+
 
 echo "############################################"
 echo "# Customize Ansible"
@@ -45,7 +56,7 @@ echo "# Install Trident"
 echo "############################################"
 
 helm repo add netapp-trident https://netapp.github.io/trident-helm-chart
-helm upgrade --install trident netapp-trident/trident-operator --version 100.2610.0 -n trident \
+helm upgrade --install trident netapp-trident/trident-operator --version 100.2610.0 -n trident --create-namespace \
 --set imageRegistry=quay.io/yvosonthehub/sig-storage \
 --set tridentAutosupportImage=quay.io/yvosonthehub/netapp/trident-autosupport:26.10.0 \
 --set operatorImage=quay.io/yvosonthehub/netapp/trident-operator:26.10.0 \

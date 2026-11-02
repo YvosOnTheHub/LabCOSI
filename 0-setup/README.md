@@ -61,12 +61,12 @@ Trident can be installed with a Helm chart.
 To avoid any issues with docker limit rates, we can use a mirror repo:    
 ```bash
 helm repo add netapp-trident https://netapp.github.io/trident-helm-chart
-helm upgrade --install trident netapp-trident/trident-operator --version 100.2610.0 -n trident \
---set tridentAutosupportImage=quay.io/yvosonthehub/netapp/trident-autosupport:26.10.0 \
---set operatorImage=quay.io/yvosonthehub/netapp/trident-operator:26.10.0 \
---set tridentImage=quay.io/yvosonthehub/netapp/trident:26.10.0 \
---set enableConcurrency=true \
---set enableCOSI=true
+helm upgrade --install trident netapp-trident/trident-operator --version 100.2610.0 -n trident --create-namespace \
+  --set tridentAutosupportImage=quay.io/yvosonthehub/netapp/trident-autosupport:26.10.0 \
+  --set operatorImage=quay.io/yvosonthehub/netapp/trident-operator:26.10.0 \
+  --set tridentImage=quay.io/yvosonthehub/netapp/trident:26.10.0 \
+  --set enableConcurrency=true \
+  --set enableCOSI=true
 ```
 After a couple of minutes, you can see the following in the Trident namespace:  
 ```bash
