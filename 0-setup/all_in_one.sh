@@ -17,6 +17,7 @@ echo "### INSTALL HELM"
 snap install helm --classic
 echo "### INSTALL AWS-CLI"
 snap install aws-cli --classic
+mkdir -p ~/.aws
 
 
 echo "############################################"
@@ -56,7 +57,7 @@ echo "# Install Tridentctl"
 echo "############################################"
 
 wget https://github.com/NetApp/trident/releases/download/v26.10.0/trident-installer-26.10.0.tar.gz -O ~/trident-installer-26.10.0.tar.gz
-tar -xf trident-installer-26.10.0.tar.gz
+tar -xf ~/trident-installer-26.10.0.tar.gz
 cp ~/trident-installer/tridentctl /usr/local/bin/
 
 echo "############################################"
@@ -121,6 +122,6 @@ alias kd='kubectl describe'
 alias kdel='kubectl delete'
 alias kedit='kubectl edit'
 alias kx='kubectl exec -it'
-alias trident=tridentctl -n trident
+alias trident='tridentctl -n trident'
 EOT
 echo "Bash customized!"

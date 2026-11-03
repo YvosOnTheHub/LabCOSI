@@ -1,0 +1,65 @@
+---
+- hosts: localhost
+  collections:
+    - netapp.ontap
+
+  vars:
+    svm_name:                       "svm3"
+    mgmt_lif:                       "192.168.0.156"
+    
+    ontap_parameters:               &ontap_parameters
+      hostname:                     "{{ hostname }}" 
+      username:                     "{{ username }}" 
+      password:                     "{{ password }}"
+      https:                        true
+      validate_certs:               false
+
+  name: SVM3 Customization
+  tasks:
+  - name: Configure SVM Mgmt Service Policy
+    netapp.ontap.na_ontap_service_policy:
+     state:                         present
+     vserver:                       "{{ svm_name }}"
+     name:                          tenant_management
+     services:
+       - data_core
+       - management_https
+     <<: *ontap_parameters
+
+  - name: Create Mgmt LIF
+    netapp.ontap.na_ontap_interface:
+      state:                        present
+      interface_name:               "{{ svm_name }}-mgmt"
+      home_port:                    e0e
+      home_node:                    cluster3-01
+      admin_status:                 up
+      service_policy:               tenant_management
+      address:                      "{{ mgmt_lif }}"
+      netmask:                      255.255.255.0
+      vserver:                      "{{ svm_name }}"
+      <<: *ontap_parameters
+
+  - name: Unlock VSadmin
+    netapp.ontap.na_ontap_user:
+     state:                         present
+     name:                          vsadmin
+     set_password:                  Netapp1!
+     lock_user:                     False
+     vserver:                       "{{ svm_name }}"
+     <<: *ontap_parameters
+
+  - name: Rename interface
+    netapp.ontap.na_ontap_interface:
+     state:                          present
+     from_name:                      "svm3"
+     interface_name:                 "{{ svm_name }}-DataLIF-NAS"
+     vserver:                        "{{ svm_name }}"
+     <<: *ontap_parameters
+
+  - name: Rename interface
+    netapp.ontap.na_ontap_interface:
+     state:                          present
+     from_name:                      "lif_svm3_5515"
+     interface_name:                 "{{ svm_name }}-DataLIF-NAS-S3"
+     vserver:                        "{{ svm_name }}"
+     <<: *ontap_parameters

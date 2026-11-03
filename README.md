@@ -87,6 +87,6 @@ Note that there is a strict one-to-one relationship between a `bucket` and `buck
 The NetApp LabOnDemand platform provides an environment with both StorageGRID and ONTAP: [Cloud Tiering with FabricPool for Cost-Efficient Storage v3.0](https://labondemand.netapp.com/node/1610).  
 Once logged in, please use Putty to connect to the host *ubuntu*.  
 Let's use it to configure and test COSI:  
-- [0 - Setup](./0-setup/)
-- [1 - StorageGRID](./1-storagegrid/)
-- [2 - ONTAP](./2-ontap/) _WORK IN PROGRESS_
+- [0 - Setup](./0-setup/)  
+- [1 - StorageGRID](./1-storagegrid/)  
+- [2 - ONTAP](./2-ontap/)

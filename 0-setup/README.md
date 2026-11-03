@@ -16,6 +16,7 @@ snap install kubectl --classic
 snap install helm --classic
 snap install aws-cli --classic
 systemctl enable --now docker
+mkdir -p ~/.aws
 ```
 
 ### Customize Ansible
@@ -53,7 +54,7 @@ kubectl cluster-info --context kind-cosi-k8s
 First, let's get the Tridentctl binary:  
 ```bash
 wget https://github.com/NetApp/trident/releases/download/v26.10.0/trident-installer-26.10.0.tar.gz -O ~/trident-installer-26.10.0.tar.gz
-tar -xf trident-installer-26.10.0.tar.gz
+tar -xf ~/trident-installer-26.10.0.tar.gz
 cp ~/trident-installer/tridentctl /usr/local/bin/
 ```
 Trident can be installed with a Helm chart.  

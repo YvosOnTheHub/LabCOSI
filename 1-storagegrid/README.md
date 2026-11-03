@@ -161,7 +161,7 @@ $ kubectl get bucket "$(kubectl get bucketclaim sg-bucket-claim -n cosisg -o jso
 ```
 The process also created a secret in the same namespace, that contains the keys to connect to the bucket:  
 ```bash
-kubectl get secret sg-bucket-creds -n cosisg -o json | jq '.data | keys'
+$ kubectl get secret sg-bucket-creds -n cosisg -o json | jq '.data | keys'
 [
   "COSI_S3_ACCESS_KEY_ID",
   "COSI_S3_ACCESS_SECRET_KEY",
@@ -351,5 +351,9 @@ $ curl -sk -X GET "https://dc1-adm1.demo.netapp.com/api/v4/org/containers" -H "a
 demo
 ```
 The bucket created by Trident is indeed gone.
+
+## H. Observations
+
+If you delete and recreate the `BucketAccess` resource linked to your `BucketClaim`, it will generate a new set of keys to access the Bucket.  
 
 This closes the first part of this chapter, you can now move to the COSI integration with ONTAP.
