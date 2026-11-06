@@ -57,7 +57,7 @@ echo "# Install Tridentctl"
 echo "############################################"
 
 wget https://github.com/NetApp/trident/releases/download/v26.10.0/trident-installer-26.10.0.tar.gz -O ~/trident-installer-26.10.0.tar.gz
-tar -xf ~/trident-installer-26.10.0.tar.gz
+tar -xf ~/trident-installer-26.10.0.tar.gz -C ~/
 cp ~/trident-installer/tridentctl /usr/local/bin/
 
 echo "############################################"
