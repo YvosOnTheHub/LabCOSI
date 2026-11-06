@@ -207,13 +207,13 @@ export SGBUCKETKEY=$(kubectl get secret sg-bucket-creds -n cosisg -o jsonpath='{
 export SGBUCKETSECRET=$(kubectl get secret sg-bucket-creds -n cosisg -o jsonpath='{.data.COSI_S3_ACCESS_SECRET_KEY}' | base64 -d)
 export SGBUCKETID=$(kubectl get secret sg-bucket-creds -n cosisg  -o jsonpath='{.data.COSI_S3_BUCKET_ID}' | base64 -d)
 
-cat << EOF >> .aws/config
+cat << EOF >> ~/.aws/config
 [profile sg]
 endpoint_url = https://dc1-adm1.demo.netapp.com:10443/
 region = us-east-1
 EOF
 
-cat << EOF >> .aws/credentials
+cat << EOF >> ~/.aws/credentials
 [sg]
 aws_access_key_id = $SGBUCKETKEY
 aws_secret_access_key = $SGBUCKETSECRET
