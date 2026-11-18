@@ -89,4 +89,6 @@ Once logged in, please use Putty to connect to the host *ubuntu*.
 Let's use it to configure and test COSI:  
 - [0 - Setup](./0-setup/)  
 - [1 - StorageGRID](./1-storagegrid/)  
+  - [1a - Keys without certificates](./1-storagegrid/1-keys/)  
+  - [1b - Certificates](./1-storagegrid/2-certificates/)  
 - [2 - ONTAP](./2-ontap/)

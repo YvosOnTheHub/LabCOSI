@@ -1,0 +1,137 @@
+
+
+echo "# 1. Get a token"
+TOKEN=$(curl -sk -X POST "https://dc1-adm1.demo.netapp.com/api/v4/authorize" \
+  -H "accept: application/json" -H "Content-Type: application/json" \
+  -d '{"username":"root","password":"Netapp1!","cookie":false,"csrfToken":false}' \
+  | jq -r .data) && echo $TOKEN
+
+echo "# 2. List the tenant accounts"
+TENANTS=$(curl -sk -X GET "https://dc1-adm1.demo.netapp.com/api/v4/grid/accounts" -H "accept: application/json" -H "Authorization: Bearer $TOKEN") && echo $TENANTS
+
+echo "# 3. Retrieve the "Lod" Tenant id"
+TENANTID=$(echo $TENANTS | jq -r '.data[] | select(.name == "LoD") | .id') && echo $TENANTID
+
+cat << EOF > 0-TOS.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: storagegrid
+  namespace: trident
+type: Opaque
+stringData:
+  username: root
+  password: Netapp1!
+---
+apiVersion: trident.netapp.io/v1
+kind: TridentObjectStore
+metadata:
+  name: storagegrid
+  namespace: trident
+spec:
+  objectStoreDriver: storage-grid
+  accountId: "$TENANTID"
+  managementEndpoint: https://192.168.0.80/
+  s3Endpoint: https://dc1-adm1.demo.netapp.com:10443/
+  insecureSkipVerify: true
+  credentials:
+    secretName: storagegrid
+  labels:
+    performance: gold
+EOF
+
+cat << EOF > 1-Classes.yaml
+apiVersion: objectstorage.k8s.io/v1alpha2
+kind: BucketClass
+metadata:
+  name: sg-bucket-class
+spec:
+  driverName: cosi.trident.netapp.io
+  deletionPolicy: Delete
+  parameters:
+    objectStoreType: "storage-grid"
+    selector: "performance=gold"
+---
+apiVersion: objectstorage.k8s.io/v1alpha2
+kind: BucketAccessClass
+metadata:
+  name: trident-s3-key
+spec:
+  driverName: cosi.trident.netapp.io
+  authenticationType: Key
+  multiBucketAccess: MultipleBuckets
+EOF
+
+cat << EOF > 2-BucketClaim.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cosisg
+---
+apiVersion: objectstorage.k8s.io/v1alpha2
+kind: BucketClaim
+metadata:
+  name: sg-bucket-claim
+  namespace: cosisg
+spec:
+  bucketClassName: sg-bucket-class
+  protocols: ["S3"]
+---
+apiVersion: objectstorage.k8s.io/v1alpha2
+kind: BucketAccess
+metadata:
+  name: sg-bucket-access
+  namespace: cosisg
+spec:
+  bucketAccessClassName: trident-s3-key
+  protocol: S3
+  bucketClaims:
+    - bucketClaimName: sg-bucket-claim
+      accessMode: ReadWrite
+      accessSecretName: sg-bucket-creds
+EOF
+
+cat << EOF > 3-CheckConfig.sh
+echo "###################################################"
+echo "# Retrieve Bucket config"
+echo "###################################################"
+kubectl get bucket \$(kubectl get bucketclaim sg-bucket-claim -n cosisg -o jsonpath='{.status.boundBucketName}') -o json | jq .status
+
+echo
+echo "###################################################"
+echo "# Decode secret"
+echo "###################################################"
+kubectl get secret sg-bucket-creds -n cosisg -o go-template='{{range \$k,\$v := .data}}{{printf "%s: %s\n" \$k (\$v | base64decode)}}{{end}}'
+
+SGBUCKETKEY=\$(kubectl get secret sg-bucket-creds -n cosisg -o jsonpath='{.data.COSI_S3_ACCESS_KEY_ID}' | base64 -d)
+SGBUCKETSECRET=\$(kubectl get secret sg-bucket-creds -n cosisg -o jsonpath='{.data.COSI_S3_ACCESS_SECRET_KEY}' | base64 -d)
+
+echo "###################################################"
+echo "# Write .aws files"
+echo "###################################################"
+cat << EOT >> ~/.aws/config
+[profile sg]
+endpoint_url = https://dc1-adm1.demo.netapp.com:10443/
+region = us-east-1
+EOT
+
+cat << EOT >> ~/.aws/credentials
+[sg]
+aws_access_key_id = \$SGBUCKETKEY
+aws_secret_access_key = \$SGBUCKETSECRET
+EOT
+EOF
+
+
+
+cat << EOF > 4-UseBucket.sh
+SGBUCKETID=\$(kubectl get secret sg-bucket-creds -n cosisg  -o jsonpath='{.data.COSI_S3_BUCKET_ID}' | base64 -d)
+echo "BucketID: \$SGBUCKETID"
+echo
+echo "###################################################"
+echo "# Commands:"
+echo "aws s3 cp test.txt s3://\$SGBUCKETID/test.txt --profile sg --no-verify-ssl"
+echo "aws s3 ls s3://\$SGBUCKETID/ --profile sg --no-verify-ssl"
+echo "aws s3 rm --no-verify-ssl s3://\$SGBUCKETID/ --recursive"
+echo "###################################################"
+EOF

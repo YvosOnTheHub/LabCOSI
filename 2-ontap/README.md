@@ -215,7 +215,7 @@ export ONTAPBUCKETID=$(kubectl get secret ontap-bucket-creds -n cosiontap -o jso
 export ONTAPBUCKETREGION=$(kubectl get secret ontap-bucket-creds -n cosiontap -o jsonpath='{.data.COSI_S3_REGION}' | base64 -d)
 export ONTAPBUCKETENDPOINT=$(kubectl get secret ontap-bucket-creds -n cosiontap -o jsonpath='{.data.COSI_S3_ENDPOINT}' | base64 -d)
 
-cat << EOF >> .aws/config
+cat << EOF >> ~/.aws/config
 [profile ontap]
 endpoint_url = $ONTAPBUCKETENDPOINT
 region = $ONTAPBUCKETREGION
@@ -223,7 +223,7 @@ request_checksum_calculation = when_required
 response_checksum_validation = when_required
 EOF
 
-cat << EOF >> .aws/credentials
+cat << EOF >> ~/.aws/credentials
 [ontap]
 aws_access_key_id = $ONTAPBUCKETKEY
 aws_secret_access_key = $ONTAPBUCKETSECRET
